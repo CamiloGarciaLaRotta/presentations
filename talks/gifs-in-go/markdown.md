@@ -242,7 +242,7 @@ Must create lots of higher abstraction helper methods
 7  gc.LineTo(100, 50)
 8  gc.QuadCurveTo(100, 10, 10, 10)
 9  gc.Close()
-10  gc.FillStroke()
+10 gc.FillStroke()
 
   // then transform into image.Paletted
 ```
@@ -270,25 +270,25 @@ No support for image.Paletted.
 # peterhellberg/gfx
 
 ```go
-a := &gfx.Animation{Delay: 15}
+1 a := &gfx.Animation{Delay: 15}
 
-// add circles and a polygon to a paletted image
-for i := 0; i < 10; i++ {
-  m := gfx.NewPaletted(w, h)  
-  p := gfx.Polygon{
-    {rand.Float64()*w, rand.Float64()*h},
-    // repeat the line above 4x
-  }
+2 // add circles and a polygon to a paletted image
+3 for i := 0; i < 10; i++ {
+4   m := gfx.NewPaletted(w, h)
+5   p := gfx.Polygon{
+6     // repeat the line below 4x
+7     {rand.Float64()*w, rand.Float64()*h},
+8   }
 
-  gfx.DrawPolygon(m, p)
-  gfx.DrawCircleFilled(
-    m, gfx.V(rand.Float64()*w, rand.Float64()*h))
-  // repeat the line above 4x
-  
-  a.AddPalettedImage(m)
-}
+9   gfx.DrawPolygon(m, p)
+10   // repeat the line below 4x
+11   gfx.DrawCircleFilled(
+12     m, gfx.V(rand.Float64()*w, rand.Float64()*h))
+13
+14   a.AddPalettedImage(m)
+15 }
 
-a.SaveGIF("gfx.gif")
+16 a.SaveGIF("gfx.gif")
 ```
 
 ---
