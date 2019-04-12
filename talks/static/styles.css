@@ -2,21 +2,21 @@
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 400;
-  src: url('../src/Roboto-Regular.ttf');
+  src: url('../static/Roboto-Regular.ttf');
 }
 
 @font-face {
   font-family: 'Roboto';
   font-style: bold;
   font-weight: 700;
-  src: url('../src/Roboto-Bold.ttf');
+  src: url('../static/Roboto-Bold.ttf');
 }
 
 @font-face {
   font-family: 'Ubuntu Mono';
   font-style: regular;
   font-weight: 400;
-  src: url('../src/UbuntuMono-Regular.ttf');
+  src: url('../static/UbuntuMono-Regular.ttf');
 }
 
 body {
@@ -65,4 +65,8 @@ h3 {
 
 .no-bullet>ul>li {
   list-style-type: none;
+}
+
+li {
+  margin-top: 10px;
 }

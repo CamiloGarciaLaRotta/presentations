@@ -4,16 +4,17 @@
 <head>
   <title>GIFs in Go</title>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="../src/styles.css">
+  <link rel="stylesheet" href="../static/styles.css">
 </head>
 
 <body>
   <textarea id="source"></textarea>
-  <script src="../src/remark-0.14.0.min.js">
+  <script src="../static/remark-0.14.0.min.js">
   </script>
   <script>
     var slideshow = remark.create({
       sourceUrl: 'markdown.md',
+      highlightStyle: 'vs',
       countIncrementalSlides: false
     });
   </script>
