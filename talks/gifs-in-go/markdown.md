@@ -147,14 +147,17 @@ type Paletted struct {
 ```go
   // randomFrame creates a frame of size w x h
 1 func randomFrame(w, h int) *image.Paletted {
+
 2   img := image.NewPaletted(
 3     image.Rect(0, 0, w, h),  palette.Plan9)
+
 4   draw.Draw(
 5     img, 
 6     img.Rect, 
 7     &image.Uniform{randomColor()}, 
 8     image.ZP, 
 9     draw.Src)
+
 10   return img
 11 }
 ```
@@ -193,18 +196,19 @@ https://blog.golang.org/go-imagedraw-package
 5		delays[i] = 50
 6		frames[i] = randomFrame(h, w)
 7	}
-
+```
+--
+```go
 8   g := gif.GIF{Delay: delays, Image: frames}
-9
-10   f, err := os.Create("stdlib.gif")
-11   if err != nil {
-12   	log.Fatal(err)
-13   }
-14   defer f.Close()
+10  f, err := os.Create("stdlib.gif")
+11  if err != nil {
+12    log.Fatal(err)
+13  }
+14  defer f.Close()
  
-15   if err := gif.EncodeAll(f, &g); err != nil {
-16   	log.Fatal(err)
-27   }
+15  if err := gif.EncodeAll(f, &g); err != nil {
+16    log.Fatal(err)
+27  }
 ```
 
 ---
@@ -228,23 +232,27 @@ Must create lots of higher abstraction helper methods
 # llgcode/draw2d
 
 ```go
-  // Initialize the graphic context on an RGBA image
+   // Initialize the graphic context on an RGBA image
 1  dest := image.NewRGBA(image.Rect(0, 0, h, w))
 2  gc := draw2dimg.NewGraphicContext(dest)
-
-  // Set some properties
+```
+--
+```go
+   // Set some properties
 3  gc.SetFillColor(randomColor())
 4  gc.SetStrokeColor(randomColor())
 5  gc.SetLineWidth(5)
-
-  // Draw a closed shape
+```
+--
+```go
+   // Draw a closed shape
 6  gc.MoveTo(10, 10)
 7  gc.LineTo(100, 50)
 8  gc.QuadCurveTo(100, 10, 10, 10)
 9  gc.Close()
 10 gc.FillStroke()
 
-  // then transform into image.Paletted
+   // then transform into image.Paletted
 ```
 ---
 
@@ -271,24 +279,34 @@ No support for image.Paletted.
 
 ```go
 1 a := &gfx.Animation{Delay: 15}
-
-2 // add circles and a polygon to a paletted image
-3 for i := 0; i < 10; i++ {
-4   m := gfx.NewPaletted(w, h)
-5   p := gfx.Polygon{
-6     // repeat the line below 4x
-7     {rand.Float64()*w, rand.Float64()*h},
-8   }
-
-9   gfx.DrawPolygon(m, p)
-10   // repeat the line below 4x
-11   gfx.DrawCircleFilled(
-12     m, gfx.V(rand.Float64()*w, rand.Float64()*h))
-13
-14   a.AddPalettedImage(m)
-15 }
-
-16 a.SaveGIF("gfx.gif")
+2 for i := 0; i < 10; i++ {
+```
+--
+```go
+3   m := gfx.NewPaletted(w, h)
+```
+--
+```go
+4   p := gfx.Polygon{
+      //repeat the line below 4x
+6     {rand.Float64()*w, rand.Float64()*h},
+7   }
+8   gfx.DrawPolygon(m, p)
+```
+--
+```go
+    // repeat the line below 4x
+9   gfx.DrawCircleFilled(
+10    m, gfx.V(rand.Float64()*w, rand.Float64()*h))
+```
+--
+```go
+11  a.AddPalettedImage(m)
+12 }
+```
+--
+```go
+13 a.SaveGIF("gfx.gif")
 ```
 
 ---
