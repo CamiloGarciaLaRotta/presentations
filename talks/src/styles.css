@@ -1,0 +1,68 @@
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../src/Roboto-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: bold;
+  font-weight: 700;
+  src: url('../src/Roboto-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'Ubuntu Mono';
+  font-style: regular;
+  font-weight: 400;
+  src: url('../src/UbuntuMono-Regular.ttf');
+}
+
+body {
+  font-family: 'Roboto';
+}
+
+h1,
+h2,
+h3 {
+  font-weight: bold;
+}
+
+.remark-slide-content,
+.remark-code,
+.remark-inline-code {
+  font-size: 25px;
+}
+
+.remark-code,
+.remark-inline-code {
+  font-family: 'Ubuntu Mono';
+}
+
+.remark-inline-code {
+  color: #af0c0c;
+}
+
+.cols {
+  display: flex;
+}
+
+.left-col,
+.right-col {
+  flex: 50%;
+}
+
+.footnote {
+  font-size: 15pt;
+  color: #696868;
+  position: fixed;
+  bottom: 0px;
+  left: 10px;
+  height: 50px;
+  width: 100%;
+}
+
+.no-bullet>ul>li {
+  list-style-type: none;
+}
