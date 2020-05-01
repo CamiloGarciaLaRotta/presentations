@@ -37,6 +37,26 @@ If you want to follow along, you can find the slides in the URL at the bottom
   .footnote[tinyurl.com/gifs-in-go]
 ]
 
+.cols[
+.left-col[
+### GifHub
+```bash
+gifhub -d 40 campoy
+```
+
+1. concurrently get contributions for each year
+2. intermediate stages to generate individual frames
+3. a sink stage to bundle all frames into a GIF
+
+`blog.golang.org/pipelines`
+]
+
+.right-col[
+  .center[<img src="campoy.gif" height="380" />]
+]
+
+]
+
 ???
 GitHub has a graph which plots the distribution of your contributions by type
 
@@ -52,38 +72,20 @@ GifHub follows the pipeline design for concurrency:
 - some intermediate stages to generate a graph
 - and a sink stage to bundle all frames into a GIF
 
-The initial dependencies where...  
-
---
-
-### GifHub
-
-
-.cols[
-.left-col[
-  .center[<img src="campoy.gif" width="300" />]
-]
-
-.right-col[
-```bash
-gifhub -d 40 campoy
-```
-
-#### Dependencies
-- urfave/cli
-- ImageMagick  
-`SVG -> JPG -> GIF`
-]
-]
-
 ---
+
 # Background
 
 .left[
   .footnote[tinyurl.com/gifs-in-go]
 ]
 
+.cols[
+  .left-col[
+
 ### The Problem
+  ]
+]
 
 ???
 Unfortunately, there were some issues with my initial choice of dependencies  
@@ -117,7 +119,6 @@ All the code can be found in the `gif-playground` branch of the GifHub repo:
   .footnote[tinyurl.com/gifs-in-go]
 ]
 
---
 .left[### Libraries Explored]
 .cols[
 .left-column[
@@ -129,6 +130,12 @@ All the code can be found in the `gif-playground` branch of the GifHub repo:
 ]
 
 ???
+So I went looking for a simple way to generate GIFs in go
+
+I wanted a pure Go implementation to ensure cross platform portability
+
+These are the libraries I played with.
+
 All the code I'll be showing in this presentation can be found in GifHub's playground branch
 
 I am not related in anyway to these projects, I simply want to showcase their strenghts and weaknesses so that other developpers know what tool to use depending on their problem
@@ -151,7 +158,7 @@ type GIF struct {
   ...
 }
 ```
-
+--
 ```go
 //image
 type Paletted struct {
@@ -187,22 +194,26 @@ A palleted image is a rectangle, a set of for each pixel in that rectangle and t
 ]
 
 ```go
-  // blog.golang.org/image-draw
-  // randomFrame creates a frame of size w x h
-1 func randomFrame(w, h int) *image.Paletted {
+// blog.golang.org/image-draw
+// randomFrame creates a frame of size w x h
+func randomFrame(w, h int) *image.Paletted {
 
-2   img := image.NewPaletted(
-3     image.Rect(0, 0, w, h),  palette.Plan9)
+  img := image.NewPaletted(
+    image.Rect(0, 0, w, h),  palette.Plan9)
 
-4   draw.Draw(
-5     img, 
-6     img.Rect, 
-7     &image.Uniform{randomColor()}, 
-8     image.ZP, 
-9     draw.Src)
-
-10   return img
-11 }
+  c := randomColor()
+```
+--
+```go
+  draw.Draw(
+    img,               // dst img
+    img.Rect,          // dst region
+    &image.Uniform{c}, // src img 
+    image.ZP,          // src starting point
+    draw.Src           // operation
+  )
+  return img
+ }
 ```
 
 ???
@@ -254,21 +265,26 @@ Finally it takes an operation to apply.
 ]
 
 ```go
-1	numFrames := 5
-2	var delays = make([]int, numFrames)
-3	var frames = make([]*image.Paletted, numFrames)
+numFrames := 5
+var delays = make([]int, numFrames)
+var frames = make([]*image.Paletted, numFrames)
 
-4	for i := 0; i < numFrames; i++ {
-5		delays[i] = 50
-6		frames[i] = randomFrame(h, w)
-7	}
+// randomFrame() is the function we defined before
+for i := 0; i < numFrames; i++ {
+	delays[i] = 50
+	frames[i] = randomFrame(h, w)
+}
 ```
+
 --
+
 ```go
-8   g := gif.GIF{Delay: delays, Image: frames}
-10  f, err := os.Create("stdlib.gif")
- 
-11  gif.EncodeAll(f, &g)
+// instantiate the gif struct
+g := gif.GIF{Delay: delays, Image: frames}
+
+// persist it in a file
+f, err := os.Create("stdlib.gif")
+gif.EncodeAll(f, &g)
 ```
 
 ---
@@ -302,6 +318,10 @@ And familiarizing yourselves with how they are instantiated, manipulated and per
 
 # llgcode/draw2d
 
+.left[
+  .footnote[tinyurl.com/gifs-in-go]
+]
+
 ???
 Generates complex images through a helper struct.
 
@@ -311,32 +331,28 @@ So if you are familiar with the coordinate system top left corner, as well as th
 
 --
 
-.left[
-  .footnote[tinyurl.com/gifs-in-go]
-]
-
 ```go
-   // Initialize the graphic context on an RGBA image
-1  dest := image.NewRGBA(image.Rect(0, 0, h, w))
-2  gc := draw2dimg.NewGraphicContext(dest)
+// Initialize the graphic context on an RGBA image
+dest := image.NewRGBA(image.Rect(0, 0, h, w))
+gc := draw2dimg.NewGraphicContext(dest)
 ```
 --
 ```go
-   // Set some properties
-3  gc.SetFillColor(randomColor())
-4  gc.SetStrokeColor(randomColor())
-5  gc.SetLineWidth(5)
+// Set some properties
+gc.SetFillColor(randomColor())
+gc.SetStrokeColor(randomColor())
+gc.SetLineWidth(5)
 ```
 --
 ```go
-   // Draw a closed shape
-6  gc.MoveTo(10, 10)
-7  gc.LineTo(100, 50)
-8  gc.QuadCurveTo(100, 10, 10, 10)
-9  gc.Close()
-10 gc.FillStroke()
+// Draw a closed shape
+gc.MoveTo(10, 10)
+gc.LineTo(100, 50)
+gc.QuadCurveTo(100, 10, 10, 10)
+gc.Close()
+gc.FillStroke()
 
-   // then transform into image.Paletted
+// then transform into image.Paletted
 ```
 ---
 
@@ -385,37 +401,33 @@ Instead you create images solely by interacting with the gfx API
 Depending on your use case this might be a win or a loose
 
 --
-
 ```go
-1 a := &gfx.Animation{Delay: 15}
-2 for i := 0; i < 10; i++ {
+a := &gfx.Animation{Delay: 15}
+for i := 0; i < 10; i++ {
+  m := gfx.NewPaletted(w, h)
 ```
 --
 ```go
-3   m := gfx.NewPaletted(w, h)
+  p := gfx.Polygon{
+    //repeat the line below 4x
+    {rand.Float64()*w, rand.Float64()*h},
+  }
+  gfx.DrawPolygon(m, p)
 ```
 --
 ```go
-4   p := gfx.Polygon{
-      //repeat the line below 4x
-6     {rand.Float64()*w, rand.Float64()*h},
-7   }
-8   gfx.DrawPolygon(m, p)
+  // repeat the line below 4x
+  gfx.DrawCircleFilled(
+    m, gfx.V(rand.Float64()*w, rand.Float64()*h))
 ```
 --
 ```go
-    // repeat the line below 4x
-9   gfx.DrawCircleFilled(
-10    m, gfx.V(rand.Float64()*w, rand.Float64()*h))
+  a.AddPalettedImage(m)
+}
 ```
 --
 ```go
-11  a.AddPalettedImage(m)
-12 }
-```
---
-```go
-13 a.SaveGIF("gfx.gif")
+a.SaveGIF("gfx.gif")
 ```
 
 ---
@@ -460,17 +472,30 @@ Unfortunately, for GifHub, the lack of support for fonts is a deal breaker
 ]
 
 ```go
-1   const S = 1024
-2   dc := gg.NewContext(S, S)
-3   dc.SetRGBA(0, 0, 0, 0.1)
-4   for i := 0; i < 360; i += 15 {
-5     dc.Push()
-6     dc.RotateAbout(gg.Radians(float64(i)), S/2, S/2)
-7     dc.DrawEllipse(S/2, S/2, S*7/16, S/8)
-8     dc.Fill()
-9     dc.Pop()
-10  }
-11  dc.SavePNG("gg.png")
+// define a new context
+const S = 1024
+dc := gg.NewContext(S, S)
+```
+--
+```go
+// do a 360 rotation
+for i := 0; i < 360; i += 15 {
+  // the context works as a stack, push the curr frame
+  dc.Push()
+```
+--
+```go
+  // draw the shape
+  dc.RotateAbout(gg.Radians(float64(i)), S/2, S/2)
+  dc.DrawEllipse(S/2, S/2, S*7/16, S/8)
+  dc.Fill()
+```
+--
+```go
+  // obtain the aggregate stack
+  dc.Pop()
+}
+dc.SavePNG("gg.png")
 ```
 
 ???
